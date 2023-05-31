@@ -116,25 +116,7 @@ query {
 
 > **Warning**: `id` field is not the tweet id, but Gatbsy internal node id. Use `id_str` if you need to use the tweet id
 
-## Breaking changes
-
-3.x.x version contains some breaking changes. Here an example of how to migrate from 2.x version
-
-## Old options
-
-```js
-options: {
-  q: `@wesbos`,
-  credentials: {
-      consumer_key: "INSERT_HERE_YOUR_CONSUMER_KEY",
-      consumer_secret: "INSERT_HERE_YOUR_CONSUMER_SECRET",
-      bearer_token: "INSERT_HERE_YOUR_BEARER_TOKEN"
-  },
-  tweet_mode: 'extended'
-}
-```
-
-## New options
+## options
 
 ```js
 options: {
@@ -144,10 +126,10 @@ options: {
     bearer_token: "INSERT_HERE_YOUR_BEARER_TOKEN",
   },
   queries: {
-    wesbos: {
+    rainstormtech: {
       endpoint: "search/tweets",
       params: {
-        q: "@wesbos",
+        q: "@rainstormtech",
         tweet_mode: "extended",
       },
     },
@@ -159,7 +141,7 @@ options: {
 
 ```
 query {
-    allTwitterWesbos {
+    allTwitterRainstormtech {
         edges {
             node {
                 created_at

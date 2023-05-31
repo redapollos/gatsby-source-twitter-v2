@@ -66,7 +66,7 @@ exports.sourceNodes = async (
     // Fetch data for current API call
     if (queries) {
         // the twitter client is inited with the bearer token
-        const client = new Twitter(credentials)
+        const client = new TwitterApi(credentials)
         const readOnlyClient = client.readOnly
 
         return Promise.all(

@@ -14,7 +14,8 @@ module.exports = async (client, { endpoint, ...options }, reporter) => {
 
     const userTimeline = async function (client, endpoint, { params }) {
         try {
-            const results = await client.v1.userTimelinebyUsername(
+            console.log(params)
+            const results = await client.v1.userTimelineByUsername(
                 params.screen_name
             )
             return results && results.tweets && results.tweets.length
@@ -63,6 +64,7 @@ module.exports = async (client, { endpoint, ...options }, reporter) => {
         const results = []
         let queryParams = { ...params }
         let fetchNextResults = true
+        console.log(params)
 
         while (fetchNextResults) {
             let lastResults

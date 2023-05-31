@@ -1,4 +1,4 @@
-const Twitter = require(`twitter`)
+const { TwitterApi } = require(`twitter-api-v2`)
 
 const getTweet = require(`./twitter`)
 const { md5, camelCase } = require(`./utils`)
@@ -11,98 +11,106 @@ const nodeTypes = []
 const DEBUG = process.env.DEBUG === `true`
 
 function generateNode(tweet, contentDigest, type) {
-  const id = md5(tweet.id_str || tweet.toString())
+    const id = md5(tweet.id_str || tweet.toString())
 
-  const nodeData = {
-    id: id,
-    children: [],
-    parent: `__SOURCE__`,
-    internal: {
-      type,
-      contentDigest,
-    },
-  }
+    const nodeData = {
+        id: id,
+        children: [],
+        parent: `__SOURCE__`,
+        internal: {
+            type,
+            contentDigest,
+        },
+    }
 
-  // Removing place.bounding_box duo coordinates GraphQL issue
-  // Help wantend!
-  if (tweet && tweet.place && tweet.place.bounding_box) {
-    delete tweet.place.bounding_box
-    tweet.place.bounding_box = null
-  }
+    // Removing place.bounding_box duo coordinates GraphQL issue
+    // Help wantend!
+    if (tweet && tweet.place && tweet.place.bounding_box) {
+        delete tweet.place.bounding_box
+        tweet.place.bounding_box = null
+    }
 
-  const node = Object.assign({}, tweet, nodeData)
-  return node
+    const node = Object.assign({}, tweet, nodeData)
+    return node
 }
 
 exports.sourceNodes = async (
-  { actions, createContentDigest, reporter },
-  { queries, credentials }
+    { actions, createContentDigest, reporter },
+    { queries, credentials }
 ) => {
-  const { createNode } = actions
+    const { createNode } = actions
 
-  function createNodes(tweets, nodeType) {
-    tweets.forEach((tweet) => {
-      createNode(generateNode(tweet, createContentDigest(tweet), nodeType))
-    })
-  }
-
-  // function createEmptyTypes(nodeType) {
-  //   reporter.warn(`Create empty type ${nodeType}`)
-  //   const typeDefs = `
-  //             type ${nodeType} implements Node {
-  //               id: String
-  //             }
-
-  //             type ${nodeType} implements Node {
-  //               id: String
-  //             }
-  //           `
-
-  //   createTypes(typeDefs)
-  // }
-
-  // Fetch data for current API call
-  if (queries) {
-    const client = new Twitter(credentials)
-
-    return Promise.all(
-      Object.keys(queries)
-        .map(async (queryName) => {
-          const nodeType = camelCase(
-            `twitter ${queries[queryName].endpoint} ${queryName}`
-          )
-          const results = await getTweet(client, queries[queryName], reporter)
-
-          nodeTypes.push(nodeType)
-          return {
-            queryName,
-            nodeType,
-            results,
-          }
+    function createNodes(tweets, nodeType) {
+        tweets.forEach((tweet) => {
+            createNode(
+                generateNode(tweet, createContentDigest(tweet), nodeType)
+            )
         })
-        .map(async (queryResults) => {
-          const { queryName, results, nodeType } = await queryResults
+    }
 
-          if (DEBUG === true) {
-            saveResult(queryName, results)
-          }
+    // function createEmptyTypes(nodeType) {
+    //   reporter.warn(`Create empty type ${nodeType}`)
+    //   const typeDefs = `
+    //             type ${nodeType} implements Node {
+    //               id: String
+    //             }
 
-          if (results.length) {
-            reporter.info(`Creating Twitter nodes ${nodeType} ...`)
-            createNodes(results, nodeType)
-          } else {
-            reporter.warn(`No twitter results from ${queryName}`)
+    //             type ${nodeType} implements Node {
+    //               id: String
+    //             }
+    //           `
 
-            // Create type for empty results
-            // createEmptyTypes(nodeType)
-          }
-        })
-    )
-  } else {
-    reporter.warn(`No Twitter query found. Please check your configuration`)
-  }
+    //   createTypes(typeDefs)
+    // }
 
-  return Promise.resolve()
+    // Fetch data for current API call
+    if (queries) {
+        // the twitter client is inited with the bearer token
+        const client = new Twitter(credentials)
+        const readOnlyClient = client.readOnly
+
+        return Promise.all(
+            Object.keys(queries)
+                .map(async (queryName) => {
+                    const nodeType = camelCase(
+                        `twitter ${queries[queryName].endpoint} ${queryName}`
+                    )
+                    const results = await getTweet(
+                        readOnlyClient,
+                        queries[queryName],
+                        reporter
+                    )
+
+                    nodeTypes.push(nodeType)
+                    return {
+                        queryName,
+                        nodeType,
+                        results,
+                    }
+                })
+                .map(async (queryResults) => {
+                    const { queryName, results, nodeType } = await queryResults
+
+                    if (DEBUG === true) {
+                        saveResult(queryName, results)
+                    }
+
+                    if (results.length) {
+                        reporter.info(`Creating Twitter nodes ${nodeType} ...`)
+                        createNodes(results, nodeType)
+                    } else {
+                        reporter.warn(`No twitter results from ${queryName}`)
+
+                        // Create type for empty results
+                        // createEmptyTypes(nodeType)
+                    }
+                })
+        )
+    } else {
+        reporter.warn(`No Twitter query found. Please check your configuration`)
+    }
+
+    return Promise.resolve()
 }
 
 // const isTweetType = /^twitter/

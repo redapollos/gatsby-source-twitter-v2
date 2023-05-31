@@ -1,6 +1,6 @@
-# gatsby-source-twitter
+# gatsby-source-twitter-v2
 
-![Check code](https://github.com/G100g/gatsby-source-twitter/workflows/Check%20code/badge.svg)
+![Check code](https://github.com/G100g/gatsby-source-twitter-v2/workflows/Check%20code/badge.svg)
 
 Source plugin for pulling data into Gatsby from Twitter Search API.
 
@@ -8,14 +8,14 @@ Source plugin for pulling data into Gatsby from Twitter Search API.
 
 Actually the plugin support a bunch of API endopoints
 
-- [search/tweets](https://developer.twitter.com/en/docs/tweets/search/api-reference/get-search-tweets) - Search for tweets
-- [statuses/show](https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/get-statuses-show-id) - Get specific tweet
-- [statuses/lookup](https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/get-statuses-lookup) - Get specific multiple tweets
-- [statuses/user_timeline](https://developer.twitter.com/en/docs/tweets/timelines/api-reference/get-statuses-user_timeline) - Get user timeline tweets
-- [favorites/list](https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/get-favorites-list) - Get liked tweets from specific user
-- [statuses/oembed](https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/get-statuses-oembed) - Get oembed code from tweet url
-- [lists/members](https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/get-lists-members) - Returns the members of the specified list
-- [lists/statuses](https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/get-lists-statuses) - Returns a timeline of tweets authored by members of the specified list
+-   [search/tweets](https://developer.twitter.com/en/docs/tweets/search/api-reference/get-search-tweets) - Search for tweets
+-   [statuses/show](https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/get-statuses-show-id) - Get specific tweet
+-   [statuses/lookup](https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/get-statuses-lookup) - Get specific multiple tweets
+-   [statuses/user_timeline](https://developer.twitter.com/en/docs/tweets/timelines/api-reference/get-statuses-user_timeline) - Get user timeline tweets
+-   [favorites/list](https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/get-favorites-list) - Get liked tweets from specific user
+-   [statuses/oembed](https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/get-statuses-oembed) - Get oembed code from tweet url
+-   [lists/members](https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/get-lists-members) - Returns the members of the specified list
+-   [lists/statuses](https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/get-lists-statuses) - Returns a timeline of tweets authored by members of the specified list
 
 Check [Twitter documentation](https://developer.twitter.com/en/docs) for more details
 
@@ -30,40 +30,38 @@ Here an example of the configuration
 ```javascript
 // In your gatsby-config.js
 module.exports = {
-  plugins: [
-    {
-      resolve: `gatsby-source-twitter`,
-      options: {
-        credentials: {
-          consumer_key: "INSERT_HERE_YOUR_CONSUMER_KEY",
-          consumer_secret: "INSERT_HERE_YOUR_CONSUMER_SECRET",
-          bearer_token: "INSERT_HERE_YOUR_BEARER_TOKEN",
-        },
-        queries: {
-          nameofthequery: {
-            endpoint: "statuses/user_timeline",
-            params: {
-              screen_name: "gatsbyjs",
-              include_rts: false,
-              exclude_replies: true,
-              tweet_mode: "extended",
+    plugins: [
+        {
+            resolve: `gatsby-source-twitter-v2`,
+            options: {
+                credentials: {
+                    consumer_key: "INSERT_HERE_YOUR_CONSUMER_KEY",
+                    consumer_secret: "INSERT_HERE_YOUR_CONSUMER_SECRET",
+                    bearer_token: "INSERT_HERE_YOUR_BEARER_TOKEN",
+                },
+                queries: {
+                    nameofthequery: {
+                        endpoint: "statuses/user_timeline",
+                        params: {
+                            screen_name: "gatsbyjs",
+                            include_rts: false,
+                            exclude_replies: true,
+                            tweet_mode: "extended",
+                        },
+                    },
+                    nameofanotherthequery: {
+                        endpoint: "search/tweets",
+                        params: {
+                            q: "#gatsbyjs",
+                            tweet_mode: "extended",
+                        },
+                    },
+                },
             },
-          },
-          nameofanotherthequery: {
-            endpoint: "search/tweets",
-            params: {
-              q: "#gatsbyjs",
-              tweet_mode: "extended",
-            },
-          },
         },
-      },
-    },
-  ],
+    ],
 }
 ```
-
-> Check [this repository](https://github.com/G100g/gatsby-source-twitter-example) for more example.
 
 ## Plugin options
 
@@ -89,9 +87,9 @@ queries: {
 },
 ```
 
-- **endpoint**: The endpoint of one of the supported API.
-- **params**: The allowed params of the API specified with `endpoint` option.
-- **fetchAllResults**: Fetch all result cycling through pages. (Only for `search/tweets`)
+-   **endpoint**: The endpoint of one of the supported API.
+-   **params**: The allowed params of the API specified with `endpoint` option.
+-   **fetchAllResults**: Fetch all result cycling through pages. (Only for `search/tweets`)
 
 ## How to query your Tweets data using GraphQL
 
@@ -103,16 +101,16 @@ Below is a sample query for fetching all Tweets nodes.
 
 ```graphql
 query {
-  allTwitterGatsbyHashtag {
-    edges {
-      node {
-        full_text # or text depending by endpoint params
-        user {
-          name
+    allTwitterGatsbyHashtag {
+        edges {
+            node {
+                full_text # or text depending by endpoint params
+                user {
+                    name
+                }
+            }
         }
-      }
     }
-  }
 }
 ```
 
